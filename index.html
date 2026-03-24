@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STRIDELAB — Premium Sports Footwear</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black: #0a0a0a; --white: #f5f0e8; --accent: #ff3b00; --accent2: #00d4ff;
+      --gray: #1a1a1a; --mid: #555; --border: #2a2a2a;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body { background:var(--black); color:var(--white); font-family:'DM Sans',sans-serif; overflow-x:hidden; }
+
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 60px; background:rgba(10,10,10,0.92); backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:4px; color:var(--white); text-decoration:none; }
+    .nav-logo span { color:var(--accent); }
+    .nav-links { display:flex; gap:36px; list-style:none; }
+    .nav-links a { color:var(--white); text-decoration:none; font-size:0.85rem; font-weight:500; letter-spacing:1px; text-transform:uppercase; opacity:0.7; transition:opacity 0.2s; }
+    .nav-links a:hover { opacity:1; color:var(--accent); }
+    .cart-btn {
+      background:var(--accent); color:#fff; border:none; padding:10px 22px;
+      font-family:'Space Mono',monospace; font-size:0.8rem; letter-spacing:1px;
+      cursor:pointer; position:relative; transition:background 0.2s;
+    }
+    .cart-btn:hover { background:#cc2f00; }
+    .cart-count {
+      position:absolute; top:-8px; right:-8px;
+      background:var(--accent2); color:#000; border-radius:50%;
+      width:20px; height:20px; font-size:0.7rem; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+    }
+
+    .hero {
+      min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
+      align-items:center; padding:100px 60px 60px; position:relative; overflow:hidden;
+    }
+    .hero::before {
+      content:''; position:absolute; top:0; right:0; width:55%; height:100%;
+      background:linear-gradient(135deg,#111 0%,#1a0a00 50%,#0a0a0a 100%);
+      clip-path:polygon(10% 0,100% 0,100% 100%,0% 100%); z-index:0;
+    }
+    .hero-text { position:relative; z-index:1; }
+    .hero-tag { font-family:'Space Mono',monospace; font-size:0.75rem; color:var(--accent); letter-spacing:3px; text-transform:uppercase; margin-bottom:24px; }
+    .hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(5rem,10vw,10rem); line-height:0.9; margin-bottom:30px; }
+    .hero-title span { color:var(--accent); display:block; }
+    .hero-sub { font-size:1.1rem; font-weight:300; opacity:0.65; max-width:420px; line-height:1.7; margin-bottom:44px; }
+    .hero-btns { display:flex; gap:16px; flex-wrap:wrap; }
+    .btn-primary {
+      background:var(--accent); color:#fff; padding:16px 40px;
+      font-family:'Space Mono',monospace; font-size:0.85rem; letter-spacing:2px;
+      text-decoration:none; text-transform:uppercase; display:inline-block;
+      border:2px solid var(--accent); transition:all 0.2s;
+    }
+    .btn-primary:hover { background:#cc2f00; border-color:#cc2f00; transform:translateY(-2px); }
+    .btn-secondary {
+      background:transparent; color:var(--white); padding:16px 40px;
+      font-family:'Space Mono',monospace; font-size:0.85rem; letter-spacing:2px;
+      text-decoration:none; text-transform:uppercase; display:inline-block;
+      border:2px solid var(--border); transition:border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color:var(--white); }
+    .hero-image { position:relative; z-index:1; display:flex; justify-content:center; align-items:center; }
+    .hero-shoe-wrap {
+      width:500px; height:400px;
+      background:radial-gradient(ellipse at center,#ff3b0015 0%,transparent 70%);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .hero-shoe-wrap img { width:100%; object-fit:contain; filter:drop-shadow(0 30px 60px rgba(255,59,0,0.3)); animation:float 4s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
+    .hero-stats { position:absolute; bottom:60px; left:60px; display:flex; gap:60px; }
+    .stat-num { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:var(--accent); line-height:1; }
+    .stat-label { font-size:0.75rem; opacity:0.5; text-transform:uppercase; letter-spacing:2px; margin-top:4px; }
+
+    .marquee-wrap { overflow:hidden; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:14px 0; background:var(--gray); }
+    .marquee { display:flex; gap:40px; animation:marquee 20s linear infinite; white-space:nowrap; }
+    .marquee span { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:4px; color:var(--mid); }
+    .marquee span.accent { color:var(--accent); }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    .categories, .featured { padding:100px 60px; }
+    .featured { background:var(--gray); }
+    .section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:60px; }
+    .section-tag { font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:3px; margin-bottom:12px; }
+    .section-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.5rem,5vw,4.5rem); line-height:1; }
+    .section-link { color:var(--white); font-size:0.85rem; text-decoration:none; opacity:0.5; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid var(--mid); padding-bottom:2px; transition:opacity 0.2s; }
+    .section-link:hover { opacity:1; }
+
+    .cat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .cat-card {
+      position:relative; overflow:hidden; aspect-ratio:3/4; cursor:pointer; background:var(--gray); display:block;
+    }
+    .cat-card img { width:100%; height:100%; object-fit:cover; transition:transform 0.6s ease; filter:brightness(0.7); }
+    .cat-card:hover img { transform:scale(1.06); filter:brightness(0.5); }
+    .cat-overlay { position:absolute; bottom:0; left:0; right:0; padding:30px; background:linear-gradient(to top,rgba(0,0,0,0.9),transparent); }
+    .cat-name { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; color:var(--white); }
+    .cat-count { font-size:0.8rem; opacity:0.5; font-family:'Space Mono',monospace; color:var(--white); }
+    .cat-tag { position:absolute; top:20px; left:20px; background:var(--accent); color:#fff; padding:6px 14px; font-family:'Space Mono',monospace; font-size:0.7rem; letter-spacing:2px; }
+
+    .product-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+    .product-card { background:var(--black); position:relative; overflow:hidden; transition:transform 0.3s; }
+    .product-card:hover { transform:translateY(-6px); }
+    .product-img-wrap { aspect-ratio:1; background:#111; display:flex; align-items:center; justify-content:center; padding:30px; position:relative; overflow:hidden; }
+    .product-img-wrap img { width:100%; height:100%; object-fit:contain; transition:transform 0.4s; filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5)); }
+    .product-card:hover .product-img-wrap img { transform:scale(1.08); }
+    .product-badge { position:absolute; top:12px; left:12px; font-family:'Space Mono',monospace; font-size:0.65rem; padding:4px 10px; letter-spacing:1px; }
+    .badge-new { background:var(--accent2); color:#000; }
+    .badge-sale { background:var(--accent); color:#fff; }
+    .badge-hot { background:#ffd700; color:#000; }
+    .product-info { padding:20px; }
+    .product-brand { font-size:0.7rem; color:var(--accent); letter-spacing:2px; text-transform:uppercase; font-family:'Space Mono',monospace; margin-bottom:6px; }
+    .product-name { font-size:1rem; font-weight:600; margin-bottom:10px; line-height:1.3; }
+    .product-bottom { display:flex; align-items:center; justify-content:space-between; }
+    .product-price { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; }
+    .product-price .old { font-size:0.9rem; text-decoration:line-through; opacity:0.4; margin-right:8px; }
+    .add-cart-btn {
+      background:transparent; border:1px solid var(--border); color:var(--white);
+      padding:8px 16px; font-family:'Space Mono',monospace; font-size:0.7rem;
+      cursor:pointer; letter-spacing:1px; transition:all 0.2s;
+    }
+    .add-cart-btn:hover { background:var(--accent); border-color:var(--accent); }
+
+    .promo { padding:80px 60px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .promo-card { position:relative; overflow:hidden; padding:60px; min-height:320px; display:flex; flex-direction:column; justify-content:flex-end; }
+    .promo-card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .promo-card::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,0.55); }
+    .promo-content { position:relative; z-index:1; }
+    .promo-tag { font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--accent2); letter-spacing:3px; margin-bottom:12px; }
+    .promo-title { font-family:'Bebas Neue',sans-serif; font-size:3rem; line-height:1; margin-bottom:20px; }
+
+    .newsletter { padding:100px 60px; text-align:center; background:var(--black); border-top:1px solid var(--border); }
+    .nl-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.5rem,5vw,4rem); margin-bottom:16px; }
+    .nl-sub { opacity:0.5; margin-bottom:40px; font-size:1rem; }
+    .nl-form { display:flex; max-width:500px; margin:0 auto; }
+    .nl-form input { flex:1; background:var(--gray); border:1px solid var(--border); border-right:none; padding:16px 24px; color:var(--white); font-family:'DM Sans',sans-serif; font-size:0.95rem; outline:none; }
+    .nl-form input::placeholder { opacity:0.4; }
+    .nl-form button { background:var(--accent); color:#fff; border:none; padding:16px 30px; font-family:'Space Mono',monospace; font-size:0.8rem; cursor:pointer; letter-spacing:1px; transition:background 0.2s; }
+    .nl-form button:hover { background:#cc2f00; }
+
+    footer { background:var(--gray); border-top:1px solid var(--border); padding:60px 60px 30px; }
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:60px; margin-bottom:60px; }
+    .footer-brand p { opacity:0.4; font-size:0.9rem; line-height:1.7; max-width:300px; margin-top:12px; }
+    .footer-col h4 { font-family:'Space Mono',monospace; font-size:0.75rem; letter-spacing:3px; color:var(--accent); margin-bottom:20px; text-transform:uppercase; }
+    .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+    .footer-col ul a { color:var(--white); text-decoration:none; opacity:0.5; font-size:0.9rem; transition:opacity 0.2s; }
+    .footer-col ul a:hover { opacity:1; }
+    .footer-bottom { border-top:1px solid var(--border); padding-top:30px; display:flex; justify-content:space-between; align-items:center; }
+    .footer-bottom p { opacity:0.3; font-size:0.8rem; font-family:'Space Mono',monospace; }
+
+    .toast { position:fixed; bottom:30px; right:30px; z-index:1000; background:var(--accent2); color:#000; padding:14px 24px; font-family:'Space Mono',monospace; font-size:0.8rem; letter-spacing:1px; transform:translateY(100px); opacity:0; transition:all 0.3s; pointer-events:none; }
+    .toast.show { transform:translateY(0); opacity:1; }
+
+    @media(max-width:900px){
+      nav { padding:16px 20px; }
+      .nav-links { display:none; }
+      .hero { grid-template-columns:1fr; padding:100px 20px 80px; }
+      .hero::before { display:none; }
+      .hero-image { display:none; }
+      .hero-stats { left:20px; bottom:20px; gap:30px; }
+      .categories,.featured { padding:60px 20px; }
+      .cat-grid { grid-template-columns:1fr; }
+      .product-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
+      .promo { padding:40px 20px; grid-template-columns:1fr; }
+      .footer-grid { grid-template-columns:1fr 1fr; }
+      .newsletter { padding:60px 20px; }
+      footer { padding:40px 20px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">STRIDE<span>LAB</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html">Shop</a></li>
+    <li><a href="products.html?cat=running">Running</a></li>
+    <li><a href="products.html?cat=basketball">Basketball</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <button class="cart-btn" onclick="window.location.href='checkout.html'">
+    🛒 CART <span class="cart-count" id="nav-cart-count">0</span>
+  </button>
+</nav>
+
+<section class="hero">
+  <div class="hero-text">
+    <p class="hero-tag">// NEW SEASON COLLECTION 2025</p>
+    <h1 class="hero-title">BUILT TO<br><span>MOVE</span>FAST</h1>
+    <p class="hero-sub">Performance footwear engineered for athletes who push limits. Every step, every stride, every sprint — elevated.</p>
+    <div class="hero-btns">
+      <a href="products.html" class="btn-primary">Shop Now</a>
+      <a href="products.html?cat=new" class="btn-secondary">New Arrivals</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="hero-shoe-wrap">
+      <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80" alt="Featured Shoe"/>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">200+</div><div class="stat-label">Styles</div></div>
+    <div class="stat"><div class="stat-num">50K+</div><div class="stat-label">Athletes</div></div>
+    <div class="stat"><div class="stat-num">4.9★</div><div class="stat-label">Rating</div></div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>RUNNING</span><span class="accent">✦</span><span>BASKETBALL</span><span class="accent">✦</span><span>TRAINING</span><span class="accent">✦</span><span>LIFESTYLE</span><span class="accent">✦</span><span>TRAIL</span><span class="accent">✦</span><span>SOCCER</span><span class="accent">✦</span><span>TENNIS</span><span class="accent">✦</span><span>CROSSFIT</span><span class="accent">✦</span>
+    <span>RUNNING</span><span class="accent">✦</span><span>BASKETBALL</span><span class="accent">✦</span><span>TRAINING</span><span class="accent">✦</span><span>LIFESTYLE</span><span class="accent">✦</span><span>TRAIL</span><span class="accent">✦</span><span>SOCCER</span><span class="accent">✦</span><span>TENNIS</span><span class="accent">✦</span><span>CROSSFIT</span><span class="accent">✦</span>
+  </div>
+</div>
+
+<section class="categories">
+  <div class="section-header">
+    <div><p class="section-tag">// EXPLORE</p><h2 class="section-title">Shop by<br>Category</h2></div>
+    <a href="products.html" class="section-link">View All →</a>
+  </div>
+  <div class="cat-grid">
+    <a href="products.html?cat=running" class="cat-card">
+      <span class="cat-tag">POPULAR</span>
+      <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&q=80" alt="Running"/>
+      <div class="cat-overlay"><div class="cat-name">RUNNING</div><div class="cat-count">48 Products</div></div>
+    </a>
+    <a href="products.html?cat=basketball" class="cat-card">
+      <img src="https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&q=80" alt="Basketball"/>
+      <div class="cat-overlay"><div class="cat-name">BASKETBALL</div><div class="cat-count">32 Products</div></div>
+    </a>
+    <a href="products.html?cat=training" class="cat-card">
+      <span class="cat-tag">NEW</span>
+      <img src="https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=80" alt="Training"/>
+      <div class="cat-overlay"><div class="cat-name">TRAINING</div><div class="cat-count">56 Products</div></div>
+    </a>
+  </div>
+</section>
+
+<section class="featured">
+  <div class="section-header">
+    <div><p class="section-tag">// BEST SELLERS</p><h2 class="section-title">Featured<br>Products</h2></div>
+    <a href="products.html" class="section-link">View All →</a>
+  </div>
+  <div class="product-grid" id="featured-products"></div>
+</section>
+
+<section class="promo">
+  <div class="promo-card">
+    <img src="https://images.unsplash.com/photo-1556906781-9a412961a6f5?w=800&q=80" alt="Running"/>
+    <div class="promo-content">
+      <p class="promo-tag">// LIMITED OFFER</p>
+      <h3 class="promo-title">UP TO 40%<br>OFF RUNNING</h3>
+      <a href="products.html?cat=running" class="btn-primary">Shop Running</a>
+    </div>
+  </div>
+  <div class="promo-card">
+    <img src="https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?w=800&q=80" alt="New arrivals"/>
+    <div class="promo-content">
+      <p class="promo-tag">// JUST DROPPED</p>
+      <h3 class="promo-title">NEW SEASON<br>ARRIVALS</h3>
+      <a href="products.html?cat=new" class="btn-secondary" style="border-color:#fff">Explore New</a>
+    </div>
+  </div>
+</section>
+
+<section class="newsletter">
+  <p class="section-tag">// STAY IN THE LOOP</p>
+  <h2 class="nl-title">Get Early Access</h2>
+  <p class="nl-sub">New drops, exclusive deals, and athlete stories — straight to your inbox.</p>
+  <div class="nl-form">
+    <input type="email" placeholder="Your email address" id="nl-email"/>
+    <button onclick="subscribeNL()">Subscribe</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo">STRIDE<span>LAB</span></a>
+      <p>Premium sports footwear for athletes who demand the best. Performance, style, and durability in every pair.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="products.html">All Products</a></li>
+        <li><a href="products.html?cat=running">Running</a></li>
+        <li><a href="products.html?cat=basketball">Basketball</a></li>
+        <li><a href="products.html?cat=training">Training</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li><a href="#">Size Guide</a></li>
+        <li><a href="#">Shipping Info</a></li>
+        <li><a href="#">Returns</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 STRIDELAB. ALL RIGHTS RESERVED.</p>
+    <p>PRIVACY · TERMS</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function getCart(){ return JSON.parse(localStorage.getItem('stridelab_cart')||'[]'); }
+  function saveCart(c){ localStorage.setItem('stridelab_cart',JSON.stringify(c)); updateCartCount(); }
+  function updateCartCount(){
+    const total = getCart().reduce((s,i)=>s+i.qty,0);
+    document.querySelectorAll('#nav-cart-count').forEach(el=>el.textContent=total);
+  }
+  function addToCart(product){
+    const cart=getCart(); const idx=cart.findIndex(i=>i.id===product.id);
+    if(idx>-1) cart[idx].qty++; else cart.push({...product,qty:1});
+    saveCart(cart); showToast(`${product.name} added to cart!`);
+  }
+  function showToast(msg){
+    const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2500);
+  }
+
+  const FEATURED=[
+    {id:1,name:'AeroStride Pro',brand:'NIKE',price:12999,oldPrice:15999,badge:'NEW',badgeType:'badge-new',img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',cat:'running'},
+    {id:2,name:'UltraBoost 22',brand:'ADIDAS',price:10499,oldPrice:13999,badge:'SALE',badgeType:'badge-sale',img:'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&q=80',cat:'running'},
+    {id:3,name:'CloudRunner X',brand:'ON CLOUD',price:14999,oldPrice:null,badge:'HOT',badgeType:'badge-hot',img:'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=80',cat:'training'},
+    {id:4,name:'FlyKnit Elite',brand:'NIKE',price:9999,oldPrice:11999,badge:'SALE',badgeType:'badge-sale',img:'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400&q=80',cat:'running'},
+  ];
+
+  document.getElementById('featured-products').innerHTML=FEATURED.map(p=>`
+    <div class="product-card">
+      <div class="product-img-wrap">
+        ${p.badge?`<span class="product-badge ${p.badgeType}">${p.badge}</span>`:''}
+        <img src="${p.img}" alt="${p.name}"/>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-bottom">
+          <div class="product-price">
+            ${p.oldPrice?`<span class="old">₹${p.oldPrice.toLocaleString('en-IN')}</span>`:''}
+            ₹${p.price.toLocaleString('en-IN')}
+          </div>
+          <button class="add-cart-btn" onclick='addToCart(${JSON.stringify(p)})'>+ ADD</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  function subscribeNL(){
+    const e=document.getElementById('nl-email');
+    if(!e.value.trim()){showToast('Please enter your email!');return;}
+    showToast('Thanks for subscribing! 🎉'); e.value='';
+  }
+  updateCartCount();
+</script>
+</body>
+</html>
