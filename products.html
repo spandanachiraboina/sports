@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop — STRIDELAB</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --black:#0a0a0a; --white:#f5f0e8; --accent:#ff3b00; --accent2:#00d4ff; --gray:#1a1a1a; --mid:#555; --border:#2a2a2a; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--black); color:var(--white); font-family:'DM Sans',sans-serif; overflow-x:hidden; }
+
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:20px 60px; background:rgba(10,10,10,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:4px; color:var(--white); text-decoration:none; }
+    .nav-logo span { color:var(--accent); }
+    .nav-links { display:flex; gap:36px; list-style:none; }
+    .nav-links a { color:var(--white); text-decoration:none; font-size:0.85rem; font-weight:500; letter-spacing:1px; text-transform:uppercase; opacity:0.7; transition:opacity 0.2s; }
+    .nav-links a:hover, .nav-links a.active { opacity:1; color:var(--accent); }
+    .cart-btn { background:var(--accent); color:#fff; border:none; padding:10px 22px; font-family:'Space Mono',monospace; font-size:0.8rem; letter-spacing:1px; cursor:pointer; position:relative; transition:background 0.2s; }
+    .cart-btn:hover { background:#cc2f00; }
+    .cart-count { position:absolute; top:-8px; right:-8px; background:var(--accent2); color:#000; border-radius:50%; width:20px; height:20px; font-size:0.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+    .page-header { padding:120px 60px 60px; border-bottom:1px solid var(--border); display:flex; align-items:flex-end; justify-content:space-between; }
+    .page-tag { font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:3px; margin-bottom:12px; }
+    .page-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(3rem,7vw,6rem); line-height:1; }
+    .result-count { font-family:'Space Mono',monospace; font-size:0.8rem; opacity:0.4; }
+
+    .shop-layout { display:grid; grid-template-columns:260px 1fr; gap:0; min-height:100vh; }
+
+    .sidebar { padding:40px 30px; border-right:1px solid var(--border); position:sticky; top:80px; height:fit-content; }
+    .filter-group { margin-bottom:36px; }
+    .filter-title { font-family:'Space Mono',monospace; font-size:0.7rem; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:16px; }
+    .filter-options { display:flex; flex-direction:column; gap:10px; }
+    .filter-btn {
+      background:transparent; border:1px solid var(--border); color:var(--white);
+      padding:9px 16px; font-family:'DM Sans',sans-serif; font-size:0.85rem;
+      cursor:pointer; text-align:left; transition:all 0.2s; letter-spacing:0.5px;
+    }
+    .filter-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .filter-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .price-range { display:flex; flex-direction:column; gap:10px; }
+    .price-range input[type=range] { accent-color:var(--accent); width:100%; }
+    .price-label { font-family:'Space Mono',monospace; font-size:0.75rem; opacity:0.6; }
+    .sort-select {
+      width:100%; background:var(--gray); border:1px solid var(--border); color:var(--white);
+      padding:10px 14px; font-family:'DM Sans',sans-serif; font-size:0.85rem;
+      cursor:pointer; outline:none; -webkit-appearance:none;
+    }
+
+    .products-area { padding:40px 40px; }
+    .product-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .product-card { background:var(--gray); position:relative; overflow:hidden; transition:transform 0.3s; }
+    .product-card:hover { transform:translateY(-6px); }
+    .product-img-wrap { aspect-ratio:1; background:#111; display:flex; align-items:center; justify-content:center; padding:30px; position:relative; overflow:hidden; }
+    .product-img-wrap img { width:100%; height:100%; object-fit:contain; transition:transform 0.4s; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+    .product-card:hover .product-img-wrap img { transform:scale(1.08); }
+    .product-badge { position:absolute; top:12px; left:12px; font-family:'Space Mono',monospace; font-size:0.65rem; padding:4px 10px; letter-spacing:1px; }
+    .badge-new { background:var(--accent2); color:#000; }
+    .badge-sale { background:var(--accent); color:#fff; }
+    .badge-hot { background:#ffd700; color:#000; }
+    .product-info { padding:20px; }
+    .product-brand { font-size:0.7rem; color:var(--accent); letter-spacing:2px; text-transform:uppercase; font-family:'Space Mono',monospace; margin-bottom:6px; }
+    .product-name { font-size:1rem; font-weight:600; margin-bottom:4px; line-height:1.3; }
+    .product-meta { font-size:0.8rem; opacity:0.4; margin-bottom:10px; }
+    .product-bottom { display:flex; align-items:center; justify-content:space-between; }
+    .product-price { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; }
+    .product-price .old { font-size:0.9rem; text-decoration:line-through; opacity:0.4; margin-right:6px; }
+    .add-cart-btn { background:transparent; border:1px solid var(--border); color:var(--white); padding:8px 16px; font-family:'Space Mono',monospace; font-size:0.7rem; cursor:pointer; letter-spacing:1px; transition:all 0.2s; }
+    .add-cart-btn:hover { background:var(--accent); border-color:var(--accent); }
+
+    /* Quick View Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--gray); max-width:800px; width:100%; display:grid; grid-template-columns:1fr 1fr; position:relative; }
+    .modal-img { background:#111; display:flex; align-items:center; justify-content:center; padding:40px; }
+    .modal-img img { width:100%; object-fit:contain; filter:drop-shadow(0 20px 40px rgba(0,0,0,0.5)); }
+    .modal-info { padding:40px; }
+    .modal-brand { font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:3px; margin-bottom:10px; }
+    .modal-name { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; line-height:1; margin-bottom:16px; }
+    .modal-desc { opacity:0.6; font-size:0.9rem; line-height:1.7; margin-bottom:20px; }
+    .modal-price { font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--accent); margin-bottom:24px; }
+    .size-label { font-family:'Space Mono',monospace; font-size:0.7rem; letter-spacing:2px; opacity:0.5; margin-bottom:12px; }
+    .size-grid { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+    .size-btn { background:transparent; border:1px solid var(--border); color:var(--white); padding:8px 14px; font-family:'Space Mono',monospace; font-size:0.8rem; cursor:pointer; transition:all 0.2s; }
+    .size-btn:hover,.size-btn.selected { background:var(--accent); border-color:var(--accent); }
+    .modal-add-btn { width:100%; background:var(--accent); color:#fff; border:none; padding:16px; font-family:'Space Mono',monospace; font-size:0.85rem; letter-spacing:2px; cursor:pointer; margin-bottom:12px; transition:background 0.2s; }
+    .modal-add-btn:hover { background:#cc2f00; }
+    .modal-close { position:absolute; top:16px; right:16px; background:transparent; border:none; color:var(--white); font-size:1.5rem; cursor:pointer; opacity:0.5; transition:opacity 0.2s; }
+    .modal-close:hover { opacity:1; }
+
+    .no-products { grid-column:1/-1; text-align:center; padding:80px 20px; }
+    .no-products h3 { font-family:'Bebas Neue',sans-serif; font-size:2rem; opacity:0.3; }
+
+    .toast { position:fixed; bottom:30px; right:30px; z-index:1000; background:var(--accent2); color:#000; padding:14px 24px; font-family:'Space Mono',monospace; font-size:0.8rem; letter-spacing:1px; transform:translateY(100px); opacity:0; transition:all 0.3s; pointer-events:none; }
+    .toast.show { transform:translateY(0); opacity:1; }
+
+    @media(max-width:1100px){ .product-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:768px){
+      nav { padding:16px 20px; }
+      .nav-links { display:none; }
+      .page-header { padding:100px 20px 40px; flex-direction:column; align-items:flex-start; gap:10px; }
+      .shop-layout { grid-template-columns:1fr; }
+      .sidebar { border-right:none; border-bottom:1px solid var(--border); position:static; padding:20px; }
+      .filter-options { flex-direction:row; flex-wrap:wrap; }
+      .products-area { padding:20px; }
+      .product-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
+      .modal { grid-template-columns:1fr; }
+      .modal-img { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">STRIDE<span>LAB</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html" class="active">Shop</a></li>
+    <li><a href="products.html?cat=running">Running</a></li>
+    <li><a href="products.html?cat=basketball">Basketball</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <button class="cart-btn" onclick="window.location.href='checkout.html'">
+    🛒 CART <span class="cart-count" id="nav-cart-count">0</span>
+  </button>
+</nav>
+
+<div class="page-header">
+  <div>
+    <p class="page-tag">// ALL PRODUCTS</p>
+    <h1 class="page-title" id="page-title">Shop All</h1>
+  </div>
+  <div class="result-count" id="result-count">Showing 0 products</div>
+</div>
+
+<div class="shop-layout">
+  <aside class="sidebar">
+    <div class="filter-group">
+      <div class="filter-title">Category</div>
+      <div class="filter-options">
+        <button class="filter-btn active" onclick="setFilter('cat','all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('cat','running',this)">Running</button>
+        <button class="filter-btn" onclick="setFilter('cat','basketball',this)">Basketball</button>
+        <button class="filter-btn" onclick="setFilter('cat','training',this)">Training</button>
+        <button class="filter-btn" onclick="setFilter('cat','lifestyle',this)">Lifestyle</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-title">Brand</div>
+      <div class="filter-options">
+        <button class="filter-btn active" onclick="setFilter('brand','all',this)">All Brands</button>
+        <button class="filter-btn" onclick="setFilter('brand','NIKE',this)">Nike</button>
+        <button class="filter-btn" onclick="setFilter('brand','ADIDAS',this)">Adidas</button>
+        <button class="filter-btn" onclick="setFilter('brand','ON CLOUD',this)">On Cloud</button>
+        <button class="filter-btn" onclick="setFilter('brand','PUMA',this)">Puma</button>
+        <button class="filter-btn" onclick="setFilter('brand','NEW BALANCE',this)">New Balance</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-title">Max Price</div>
+      <div class="price-range">
+        <input type="range" min="3000" max="25000" value="25000" id="price-range" oninput="updatePrice(this.value)"/>
+        <div class="price-label">Up to ₹<span id="price-label">25,000</span></div>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-title">Sort By</div>
+      <select class="sort-select" id="sort-select" onchange="renderProducts()">
+        <option value="default">Featured</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </div>
+  </aside>
+
+  <main class="products-area">
+    <div class="product-grid" id="product-grid"></div>
+  </main>
+</div>
+
+<!-- Quick View Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+    <div class="modal-img"><img id="modal-img" src="" alt=""/></div>
+    <div class="modal-info">
+      <div class="modal-brand" id="modal-brand"></div>
+      <div class="modal-name" id="modal-name"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="modal-price" id="modal-price"></div>
+      <div class="size-label">SELECT SIZE (UK)</div>
+      <div class="size-grid" id="size-grid"></div>
+      <button class="modal-add-btn" onclick="addFromModal()">ADD TO CART</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const ALL_PRODUCTS=[
+    {id:1,name:'AeroStride Pro',brand:'NIKE',price:12999,oldPrice:15999,badge:'NEW',badgeType:'badge-new',img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',cat:'running',desc:'Engineered for speed. Responsive foam midsole with carbon fiber plate for maximum energy return.'},
+    {id:2,name:'UltraBoost 22',brand:'ADIDAS',price:10499,oldPrice:13999,badge:'SALE',badgeType:'badge-sale',img:'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&q=80',cat:'running',desc:'Adidas Boost technology delivers incredible energy return. Perfect for long-distance running.'},
+    {id:3,name:'CloudRunner X',brand:'ON CLOUD',price:14999,oldPrice:null,badge:'HOT',badgeType:'badge-hot',img:'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=80',cat:'training',desc:'CloudTec® cushioning with zero-gravity feel. The ultimate training shoe for high-intensity workouts.'},
+    {id:4,name:'FlyKnit Elite',brand:'NIKE',price:9999,oldPrice:11999,badge:'SALE',badgeType:'badge-sale',img:'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400&q=80',cat:'running',desc:'Lightweight Flyknit upper with React foam. Breathable, flexible, and built for performance.'},
+    {id:5,name:'Air Max 270',brand:'NIKE',price:11499,oldPrice:null,badge:'',badgeType:'',img:'https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=400&q=80',cat:'lifestyle',desc:'Max Air heel unit delivers all-day cushioning. Iconic silhouette with modern performance.'},
+    {id:6,name:'Harden Vol.7',brand:'ADIDAS',price:13999,oldPrice:16499,badge:'NEW',badgeType:'badge-new',img:'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&q=80',cat:'basketball',desc:'Signature series basketball shoe. Low-cut design for quick cuts and explosive movement.'},
+    {id:7,name:'RS-X Bold',brand:'PUMA',price:7999,oldPrice:9999,badge:'SALE',badgeType:'badge-sale',img:'https://images.unsplash.com/photo-1584735175315-9d5df23be620?w=400&q=80',cat:'lifestyle',desc:'Bold retro design meets modern comfort. Chunky RS-X sole for all-day wearability.'},
+    {id:8,name:'Fresh Foam 1080',brand:'NEW BALANCE',price:15499,oldPrice:null,badge:'HOT',badgeType:'badge-hot',img:'https://images.unsplash.com/photo-1556048219-bb6978360b84?w=400&q=80',cat:'running',desc:'Premium Fresh Foam X midsole provides a plush, cushioned ride. Ideal for long runs.'},
+    {id:9,name:'Gel-Nimbus 25',brand:'NIKE',price:13799,oldPrice:15999,badge:'',badgeType:'',img:'https://images.unsplash.com/photo-1539185441755-769473a23570?w=400&q=80',cat:'training',desc:'Advanced gel cushioning technology. Engineered mesh upper for adaptive breathability.'},
+    {id:10,name:'Zoom Freak 5',brand:'NIKE',price:12499,oldPrice:null,badge:'NEW',badgeType:'badge-new',img:'https://images.unsplash.com/photo-1579338908476-3a3a1d71a706?w=400&q=80',cat:'basketball',desc:'Giannis signature shoe with full-length Zoom Air. Designed for power, speed, and precision.'},
+    {id:11,name:'Speedgoat 5',brand:'ON CLOUD',price:16999,oldPrice:19999,badge:'',badgeType:'',img:'https://images.unsplash.com/photo-1576672843344-f01907a9d40c?w=400&q=80',cat:'training',desc:'Ultra-trail running shoe with Vibram® Megagrip outsole. Maximum protection on any terrain.'},
+    {id:12,name:'NMD_R1',brand:'ADIDAS',price:8999,oldPrice:10499,badge:'SALE',badgeType:'badge-sale',img:'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400&q=80',cat:'lifestyle',desc:'Street-ready with Primeknit upper. Boost midsole for unstoppable energy and comfort.'},
+  ];
+
+  let filters={cat:'all',brand:'all',maxPrice:25000};
+  let currentProduct=null;
+  let selectedSize=null;
+
+  function getCart(){ return JSON.parse(localStorage.getItem('stridelab_cart')||'[]'); }
+  function saveCart(c){ localStorage.setItem('stridelab_cart',JSON.stringify(c)); updateCartCount(); }
+  function updateCartCount(){
+    const total=getCart().reduce((s,i)=>s+i.qty,0);
+    document.querySelectorAll('#nav-cart-count').forEach(el=>el.textContent=total);
+  }
+  function addToCart(product,size){
+    const cart=getCart();
+    const key=product.id+'_'+(size||'default');
+    const idx=cart.findIndex(i=>i.key===key);
+    if(idx>-1) cart[idx].qty++;
+    else cart.push({...product,qty:1,size:size||'UK 8',key});
+    saveCart(cart); showToast(`${product.name} (${size||'UK 8'}) added!`);
+  }
+  function showToast(msg){
+    const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2500);
+  }
+
+  function setFilter(type,val,btn){
+    filters[type]=val;
+    const group=btn.parentElement;
+    group.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts();
+  }
+
+  function updatePrice(val){
+    filters.maxPrice=parseInt(val);
+    document.getElementById('price-label').textContent=parseInt(val).toLocaleString('en-IN');
+    renderProducts();
+  }
+
+  function getFiltered(){
+    let p=[...ALL_PRODUCTS];
+    if(filters.cat!=='all') p=p.filter(x=>x.cat===filters.cat);
+    if(filters.brand!=='all') p=p.filter(x=>x.brand===filters.brand);
+    p=p.filter(x=>x.price<=filters.maxPrice);
+    const sort=document.getElementById('sort-select').value;
+    if(sort==='price-low') p.sort((a,b)=>a.price-b.price);
+    else if(sort==='price-high') p.sort((a,b)=>b.price-a.price);
+    else if(sort==='name') p.sort((a,b)=>a.name.localeCompare(b.name));
+    return p;
+  }
+
+  function renderProducts(){
+    const products=getFiltered();
+    document.getElementById('result-count').textContent=`Showing ${products.length} product${products.length!==1?'s':''}`;
+    const grid=document.getElementById('product-grid');
+    if(!products.length){
+      grid.innerHTML=`<div class="no-products"><h3>NO PRODUCTS FOUND</h3></div>`;
+      return;
+    }
+    grid.innerHTML=products.map(p=>`
+      <div class="product-card">
+        <div class="product-img-wrap" style="cursor:pointer" onclick='openModal(${JSON.stringify(p)})'>
+          ${p.badge?`<span class="product-badge ${p.badgeType}">${p.badge}</span>`:''}
+          <img src="${p.img}" alt="${p.name}"/>
+        </div>
+        <div class="product-info">
+          <div class="product-brand">${p.brand}</div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-meta">${p.cat.charAt(0).toUpperCase()+p.cat.slice(1)}</div>
+          <div class="product-bottom">
+            <div class="product-price">
+              ${p.oldPrice?`<span class="old">₹${p.oldPrice.toLocaleString('en-IN')}</span>`:''}
+              ₹${p.price.toLocaleString('en-IN')}
+            </div>
+            <button class="add-cart-btn" onclick='openModal(${JSON.stringify(p)})'>QUICK VIEW</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openModal(p){
+    currentProduct=p; selectedSize=null;
+    document.getElementById('modal-img').src=p.img;
+    document.getElementById('modal-brand').textContent=p.brand;
+    document.getElementById('modal-name').textContent=p.name;
+    document.getElementById('modal-desc').textContent=p.desc;
+    document.getElementById('modal-price').textContent=`₹${p.price.toLocaleString('en-IN')}`;
+    const sizes=['UK 6','UK 7','UK 8','UK 9','UK 10','UK 11','UK 12'];
+    document.getElementById('size-grid').innerHTML=sizes.map(s=>`
+      <button class="size-btn" onclick="selectSize('${s}',this)">${s}</button>
+    `).join('');
+    document.getElementById('modal-overlay').classList.add('open');
+  }
+
+  function selectSize(s,btn){
+    selectedSize=s;
+    document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  function addFromModal(){
+    if(!currentProduct) return;
+    if(!selectedSize){ showToast('Please select a size!'); return; }
+    addToCart(currentProduct,selectedSize);
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+
+  function closeModal(e){
+    if(e.target===document.getElementById('modal-overlay'))
+      document.getElementById('modal-overlay').classList.remove('open');
+  }
+
+  // Read URL params
+  const params=new URLSearchParams(window.location.search);
+  const catParam=params.get('cat');
+  if(catParam && catParam!=='new'){
+    filters.cat=catParam;
+    document.querySelectorAll('.filter-btn').forEach(btn=>{
+      btn.classList.remove('active');
+      if(btn.textContent.toLowerCase()===catParam.toLowerCase()) btn.classList.add('active');
+    });
+    document.getElementById('page-title').textContent=catParam.charAt(0).toUpperCase()+catParam.slice(1);
+  }
+
+  updateCartCount();
+  renderProducts();
+</script>
+</body>
+</html>
